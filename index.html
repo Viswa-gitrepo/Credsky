@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SKY CRED — Check the sky's credit score before you step out. Live weather with simple, actionable recommendations." />
+  <title>SKY CRED — Check the sky's credit score</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%81%EF%B8%8F%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <div class="page">
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">☁️</span>
+        <div>
+          <h1>SKY CRED</h1>
+          <p class="tagline">Check the sky's credit score before you step out.</p>
+        </div>
+      </div>
+      <p class="disclaimer" title="Application-generated interpretation, not a real credit score.">
+        Generated interpretation — not a real credit score
+      </p>
+    </header>
+
+    <main>
+      <!-- Search -->
+      <section class="search-section" aria-label="City search">
+        <form id="search-form" novalidate>
+          <label class="sr-only" for="city-input">City name</label>
+          <input
+            id="city-input"
+            type="text"
+            name="city"
+            placeholder="Search any city… e.g. Mumbai"
+            autocomplete="off"
+            spellcheck="false"
+            aria-describedby="search-hint"
+          />
+          <button id="search-btn" type="submit">Search</button>
+        </form>
+        <p id="search-hint" class="search-hint">Press Enter or click Search. Default city: Mumbai.</p>
+      </section>
+
+      <!-- Popular cities -->
+      <section class="chips-section" aria-label="Popular cities">
+        <div id="city-chips" class="city-chips" role="group" aria-label="Popular city shortcuts"></div>
+      </section>
+
+      <!-- Live region for status announcements -->
+      <p id="sr-status" class="sr-only" role="status" aria-live="polite"></p>
+
+      <!-- Error state -->
+      <section id="error-panel" class="error-panel hidden" role="alert">
+        <span class="error-icon" aria-hidden="true">⚠️</span>
+        <h2 id="error-title">Something went wrong</h2>
+        <p id="error-message">Please try again.</p>
+        <button id="retry-btn" type="button">Retry</button>
+      </section>
+
+      <!-- Loading state -->
+      <section id="loading-panel" class="loading-panel hidden" aria-hidden="true">
+        <div class="spinner" role="progressbar" aria-label="Loading weather data"></div>
+        <p>Fetching live weather…</p>
+      </section>
+
+      <!-- Weather card -->
+      <section id="weather-card" class="weather-card hidden" aria-labelledby="location-name">
+        <div class="weather-main">
+          <div class="weather-location">
+            <h2 id="location-name">—</h2>
+            <p id="location-region">—</p>
+            <p id="local-time" class="local-time">—</p>
+          </div>
+          <div class="weather-temp">
+            <img id="condition-icon" src="" alt="" width="96" height="96" />
+            <p id="temp-c" class="temp">—°</p>
+            <p id="condition-text" class="condition-text">—</p>
+            <p id="feels-like" class="feels-like">Feels like —</p>
+          </div>
+        </div>
+
+        <!-- Weather personality -->
+        <div id="personality" class="personality" role="region" aria-label="Weather personality">
+          <p class="personality-label">Today's weather personality</p>
+          <p id="personality-title" class="personality-title">—</p>
+          <p id="personality-desc" class="personality-desc">—</p>
+        </div>
+
+        <!-- Primary metrics -->
+        <div class="metric-cards">
+          <article class="metric-card">
+            <span class="metric-icon" aria-hidden="true">💧</span>
+            <p id="humidity" class="metric-value">—</p>
+            <p class="metric-label">Humidity</p>
+            <p class="metric-unit">%</p>
+          </article>
+          <article class="metric-card">
+            <span class="metric-icon" aria-hidden="true">🌬️</span>
+            <p id="wind-kph" class="metric-value">—</p>
+            <p class="metric-label">Wind</p>
+            <p class="metric-unit">km/h</p>
+          </article>
+          <article class="metric-card">
+            <span class="metric-icon" aria-hidden="true">🔆</span>
+            <p id="uv-index" class="metric-value">—</p>
+            <p class="metric-label">UV Index</p>
+            <p class="metric-unit">index</p>
+          </article>
+        </div>
+
+        <!-- Secondary metrics -->
+        <div class="secondary-grid" aria-label="Additional weather details">
+          <div class="secondary-item"><span>Cloud coverage</span><strong id="cloud">—</strong></div>
+          <div class="secondary-item"><span>Visibility</span><strong id="visibility">—</strong></div>
+          <div class="secondary-item"><span>Pressure</span><strong id="pressure">—</strong></div>
+          <div class="secondary-item"><span>Wind speed</span><strong id="wind-mp-s">—</strong></div>
+          <div class="secondary-item"><span>Temperature</span><strong id="temp-f">—</strong></div>
+          <div class="secondary-item"><span>Last updated</span><strong id="last-updated">—</strong></div>
+        </div>
+      </section>
+
+      <!-- API response viewer -->
+      <section class="json-section" aria-label="API response viewer">
+        <div class="json-header">
+          <h2>API Response</h2>
+          <div class="json-tabs" role="tablist" aria-label="JSON view mode">
+            <button id="tab-formatted" role="tab" aria-selected="true" aria-controls="json-output" class="active" type="button">Formatted</button>
+            <button id="tab-raw" role="tab" aria-selected="false" aria-controls="json-output" type="button">Raw</button>
+          </div>
+          <button id="copy-json" type="button" aria-label="Copy JSON to clipboard">Copy</button>
+        </div>
+        <pre id="json-output" tabindex="0" aria-label="Weather API JSON response">No data yet. Weather will appear here after the first API response.</pre>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>SKY CRED · Weather data by <a href="https://www.weatherapi.com/" target="_blank" rel="noopener noreferrer">WeatherAPI.com</a></p>
+    </footer>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/personality.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
