@@ -71,6 +71,17 @@
     return list.indexOf(code) !== -1;
   }
 
+  // Exposed for the animated background scene selection (app.js).
+  function isRainy(code, text) {
+    return matchesCodes(code, RAIN_CODES) ||
+      /rain|drizzle|shower|thunder|sleet/i.test(text || "");
+  }
+
+  function isSnowy(code, text) {
+    return matchesCodes(code, SNOW_CODES) ||
+      /snow|blizzard|ice|freez/i.test(text || "");
+  }
+
   function classify(input) {
     var tempC = input.tempC;
     var code = input.conditionCode;
@@ -78,19 +89,14 @@
     var uv = input.uv;
     var text = (input.conditionText || "").toLowerCase();
 
-    // Text fallbacks for robustness (in case codes are missing).
-    var isRainy =
-      matchesCodes(code, RAIN_CODES) ||
-      /rain|drizzle|shower|thunder|sleet/i.test(text);
-    var isSnowy =
-      matchesCodes(code, SNOW_CODES) ||
-      /snow|blizzard|ice|freez/i.test(text);
+    var rainy = isRainy(code, text);
+    var snowy = isSnowy(code, text);
 
     // 1. Rain beats everything.
-    if (isRainy) return PERSONALITIES["Rain Check"];
+    if (rainy) return PERSONALITIES["Rain Check"];
 
     // 2. Snow / very cold.
-    if (isSnowy || tempC <= THRESHOLDS.FREEZE_MAX_C) {
+    if (snowy || tempC <= THRESHOLDS.FREEZE_MAX_C) {
       return PERSONALITIES["Freeze Frame"];
     }
 
@@ -116,6 +122,8 @@
   global.SKYCRED_PERSONALITY = {
     THRESHOLDS: THRESHOLDS,
     PERSONALITIES: PERSONALITIES,
-    classify: classify
+    classify: classify,
+    isRainy: isRainy,
+    isSnowy: isSnowy
   };
 })(window);

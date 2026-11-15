@@ -52,7 +52,12 @@
     tabFormatted: document.getElementById("tab-formatted"),
     tabRaw: document.getElementById("tab-raw"),
     copyBtn: document.getElementById("copy-json"),
-    srStatus: document.getElementById("sr-status")
+    srStatus: document.getElementById("sr-status"),
+    bgScene: document.getElementById("bg-scene"),
+    starsLayer: document.getElementById("stars-layer"),
+    cloudsLayer: document.getElementById("clouds-layer"),
+    rainLayer: document.getElementById("rain-layer"),
+    snowLayer: document.getElementById("snow-layer")
   };
 
   // ---------- State ----------
@@ -72,6 +77,75 @@
 
   function announce(message) {
     els.srStatus.textContent = message;
+  }
+
+  // ---------- Animated background (decorative, aria-hidden) ----------
+  function populateBackground() {
+    var frag;
+    var i;
+    var el;
+
+    // Stars: 60 twinkling dots in the upper sky.
+    frag = document.createDocumentFragment();
+    for (i = 0; i < 60; i++) {
+      el = document.createElement("i");
+      var size = (Math.random() * 1.6 + 0.8).toFixed(2);
+      el.style.width = size + "px";
+      el.style.height = size + "px";
+      el.style.left = (Math.random() * 100).toFixed(2) + "%";
+      el.style.top = (Math.random() * 55).toFixed(2) + "%";
+      el.style.animationDuration = (Math.random() * 2.5 + 1.8).toFixed(2) + "s";
+      el.style.animationDelay = (Math.random() * 3).toFixed(2) + "s";
+      frag.appendChild(el);
+    }
+    els.starsLayer.appendChild(frag);
+
+    // Clouds: 5 slow-drifting clouds, negative delays spread them out.
+    for (i = 1; i <= 5; i++) {
+      el = document.createElement("i");
+      el.className = "cloud cloud--" + i;
+      els.cloudsLayer.appendChild(el);
+    }
+
+    // Rain: 45 drops with randomised position, speed and opacity.
+    frag = document.createDocumentFragment();
+    for (i = 0; i < 45; i++) {
+      el = document.createElement("i");
+      el.style.left = (Math.random() * 100).toFixed(2) + "%";
+      el.style.animationDuration = (Math.random() * 0.55 + 0.55).toFixed(2) + "s";
+      el.style.animationDelay = (-Math.random()).toFixed(2) + "s";
+      el.style.opacity = (Math.random() * 0.4 + 0.5).toFixed(2);
+      frag.appendChild(el);
+    }
+    els.rainLayer.appendChild(frag);
+
+    // Snow: 32 flakes alternating sway directions.
+    frag = document.createDocumentFragment();
+    for (i = 0; i < 32; i++) {
+      el = document.createElement("i");
+      var flake = (Math.random() * 4 + 3).toFixed(1);
+      el.style.width = flake + "px";
+      el.style.height = flake + "px";
+      el.style.left = (Math.random() * 100).toFixed(2) + "%";
+      el.style.animationName = i % 2 === 0 ? "snow-fall-a" : "snow-fall-b";
+      el.style.animationDuration = (Math.random() * 8 + 6).toFixed(2) + "s";
+      el.style.animationDelay = (-Math.random() * 14).toFixed(2) + "s";
+      el.style.opacity = (Math.random() * 0.45 + 0.5).toFixed(2);
+      frag.appendChild(el);
+    }
+    els.snowLayer.appendChild(frag);
+  }
+
+  function setScene(data) {
+    var cur = data.current;
+    var parts = [];
+    if (personality.isRainy(cur.condition.code, cur.condition.text)) {
+      parts.push("rain");
+    } else if (personality.isSnowy(cur.condition.code, cur.condition.text)) {
+      parts.push("snow");
+    }
+    if (cur.is_day === 0) parts.push("night");
+    els.bgScene.dataset.scene = parts.join(" ") || "clear";
   }
 
   function show(element) { element.classList.remove("hidden"); }
@@ -146,6 +220,8 @@
     els.personalityTitle.textContent = result.title;
     els.personalityDesc.textContent = result.description;
     els.personality.dataset.personality = result.title;
+
+    setScene(data);
 
     els.humidity.textContent = cur.humidity;
     els.windKph.textContent = cur.wind_kph;
@@ -291,6 +367,7 @@
   }
 
   // ---------- Init (FR-01) ----------
+  populateBackground();
   renderChips();
   els.input.value = config.DEFAULT_CITY;
   loadWeather(config.DEFAULT_CITY);

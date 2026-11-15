@@ -38,6 +38,10 @@ no frameworks, no backend, no mock data.
   newer results (request sequence + abort).
 - **Responsive (FR-09)** — desktop, laptop, tablet and mobile layouts with no
   horizontal overflow.
+- **Animated background** — weather-reactive scene: drifting aurora gradients
+  and floating clouds always in motion; rain particles, snowfall, twinkling
+  stars and an occasional shooting star fade in based on the live condition
+  and day/night. Disabled automatically under `prefers-reduced-motion`.
 - **Accessible** — keyboard navigation, ARIA labels, live-region announcements,
   reduced-motion support.
 
